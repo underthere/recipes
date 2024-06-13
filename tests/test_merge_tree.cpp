@@ -54,6 +54,5 @@ TEST_CASE("test merge tree") {
         tree.merge(std::make_unique<MergeTreeP>(std::make_pair(-60, -50)));
         CHECK(tree.get_data() == std::make_pair(-70, 10));
     }
-
 }
 
