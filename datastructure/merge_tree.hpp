@@ -9,6 +9,7 @@
 #include <optional>
 #include <string>
 #include <utility>
+#include <memory>
 
 namespace U {
 

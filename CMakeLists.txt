@@ -5,8 +5,6 @@ set(CMAKE_CXX_STANDARD 23)
 
 include_directories(include)
 
-set(asio_DIR asio/asio)
-include_directories(${asio_DIR}/include)
 set(folly_DIR /Volumes/MacStorage/dev_deps/folly/lib/cmake/folly)
 find_package(folly REQUIRED)
 link_directories(/opt/homebrew/Cellar/icu4c/74.2/lib/)
@@ -27,7 +25,6 @@ add_executable(test_execution tests/test_execution.cpp)
 target_include_directories(test_execution PRIVATE ${FOLLY_INCLUDE_DIR})
 target_link_libraries(test_execution PRIVATE ${FOLLY_LIBRARIES})
 
-add_library(coro coro/Task.cpp
-        coro/ThreadPool.hpp)
+add_subdirectory(coro)
 
 add_executable(play_asio tests/play_asio.cpp)
