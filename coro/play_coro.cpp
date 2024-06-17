@@ -2,6 +2,7 @@
 #include "ThreadPoolExecutor.h"
 
 #include <async_simple/coro/SyncAwait.h>
+#include "coro_io/io_context_pool.hpp"
 #include <future>
 
 Awaitable<int> async_main() {
@@ -13,6 +14,6 @@ Awaitable<int> async_main() {
 }
 
 int main(int argc, char **argv) {
-  underthere::ThreadPoolExecutor executor(8);
-  return async_simple::coro::syncAwait(async_main().via(&executor));
+  auto executor = coro_io::get_global_executor();
+  return async_simple::coro::syncAwait(async_main().via(executor));
 }

@@ -6,7 +6,6 @@
 #include <async_simple/coro/FutureAwaiter.h>
 
 #define Awaitable async_simple::coro::Lazy
-
 template <typename Func, typename... Args>
 auto sync_as_coro(Func func, Args... args)
 -> Awaitable<typename std::invoke_result_t<Func, Args...>> {
