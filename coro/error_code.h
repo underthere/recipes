@@ -23,7 +23,14 @@ inline auto error_category::message(int ev) const -> std::string {
 
 auto make_error_code(errc code) -> std::error_code;
 
+auto make_error_code(int code) -> std::error_code;
+
 inline auto make_error_code(errc code) -> std::error_code {
   return {static_cast<int>(code), error_category{}};
 }
+
+inline auto make_error_code(int code) -> std::error_code {
+  return {code, error_category{}};
+}
+
 }

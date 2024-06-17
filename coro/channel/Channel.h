@@ -3,6 +3,7 @@
 #include "../Awaitable.h"
 #include "../expected_wrapper.h"
 
+#include "NoCopy.h"
 /* what I want
  *
  * // n is the buffer size, strategy is the enqueue strategy [drop head | drop tail | block]
@@ -30,7 +31,7 @@ enum class Strategy {
 };
 
 template<typename T>
-class Queue {
+class Queue : public virtual NoCopy {
  public:
   virtual ~Queue() = default;
   virtual auto push(T &&value, std::optional<timeout_t> timeout = std::nullopt) -> void = 0;
@@ -47,7 +48,7 @@ template<typename T>
 class DropTailQueue : public Queue<T> {};
 
 template<typename T>
-class BlockQueue : public Queue<T> {
+class BlockQueue : public virtual Queue<T> {
  public:
   explicit BlockQueue(size_t n) : n_(n) {}
   auto push(T &&value, std::optional<timeout_t> timeout = std::nullopt) -> void override {
@@ -80,7 +81,7 @@ inline static auto makeQueue(size_t n, Strategy strategy) -> std::unique_ptr<Que
 }
 
 template<typename T>
-class ChannelBridge {
+class ChannelBridge : public virtual NoCopy {
  public:
   virtual ~ChannelBridge() = default;
   virtual auto closed() const -> bool = 0;
@@ -113,7 +114,7 @@ class ChannelBridgeImpl : public virtual ChannelBridge<T> {
 };
 
 template<typename T>
-class Sender {
+class Sender : public virtual NoCopy {
  public:
   explicit Sender(std::shared_ptr<ChannelBridge<T>> bridge);
   virtual ~Sender() = default;
@@ -127,7 +128,7 @@ class Sender {
 };
 
 template<typename T>
-class Receiver {
+class Receiver : public virtual NoCopy {
  public:
   explicit Receiver(std::shared_ptr<ChannelBridge<T>> bridge);
   virtual ~Receiver() = default;
@@ -138,7 +139,7 @@ class Receiver {
 };
 
 template<typename T>
-class Channel {
+class Channel : public virtual NoCopy {
  public:
   Channel(size_t n, Strategy strategy);
   virtual ~Channel() = default;
