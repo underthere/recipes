@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../Awaitable.h"
-#include "../expected_wrapper.h"
+#include "src/Awaitable.h"
+#include "src/expected_wrapper.h"
 
-#include "NoCopy.h"
+#include "src/NoCopy.h"
 /* what I want
  *
  * // n is the buffer size, strategy is the enqueue strategy [drop head | drop tail | block]

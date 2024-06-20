@@ -1,11 +1,16 @@
 #pragma once
 
 #include <type_traits>
-#include <async_simple/coro/Lazy.h>
-#include <async_simple/Promise.h>
-#include <async_simple/coro/FutureAwaiter.h>
+#include "thirdparty/async_simple/async_simple/coro/Lazy.h"
+#include "thirdparty/async_simple/async_simple/Promise.h"
+#include "thirdparty/async_simple/async_simple/coro/FutureAwaiter.h"
+#include "thirdparty/async_simple/async_simple/coro/SpinLock.h"
+#include "thirdparty/async_simple/async_simple/coro/ConditionVariable.h"
 
 #define Awaitable async_simple::coro::Lazy
+#define CoMutex async_simple::coro::SpinLock
+#define CoConditionVariable async_simple::coro::ConditionVariable
+
 template <typename Func, typename... Args>
 auto sync_as_coro(Func func, Args... args)
 -> Awaitable<typename std::invoke_result_t<Func, Args...>> {

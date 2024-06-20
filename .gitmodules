@@ -1,6 +1,9 @@
 [submodule "coro/thirdparty/async_simple"]
-	path = coro/thirdparty/async_simple
+	path = thirdparty/async_simple
 	url = https://github.com/alibaba/async_simple.git
 [submodule "coro/thirdparty/asio"]
-	path = coro/thirdparty/asio
+	path = thirdparty/asio
 	url = https://github.com/chriskohlhoff/asio.git
+[submodule "thirdparty/googletest"]
+	path = thirdparty/googletest
+	url = https://github.com/google/googletest.git
