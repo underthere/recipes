@@ -25,11 +25,6 @@ target_link_libraries(play_coro PRIVATE async_simple_header_only)
 
 option(ENABLE_TEST "Enable test" ON)
 if (ENABLE_TEST)
-    function(add_test_executable name)
-        add_executable(${name} ${ARGN})
-        target_include_directories(${name} PRIVATE . ${gtest_INCLUDE_DIR} ${gmock_INCLUDE_DIR})
-        target_link_libraries(${name} PRIVATE gtest_main)
-    endfunction()
     add_test_executable(test_ring_buffer tests/test_ring_buffer.cpp)
 
     add_executable(coro_ping_pong tests/test_coro_ping_pong.cpp)

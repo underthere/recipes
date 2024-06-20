@@ -1,0 +1,5 @@
+function(add_test_executable name)
+    add_executable(${name} ${ARGN})
+    target_include_directories(${name} PRIVATE . ${gtest_INCLUDE_DIR} ${gmock_INCLUDE_DIR})
+    target_link_libraries(${name} PRIVATE gtest_main)
+endfunction()
