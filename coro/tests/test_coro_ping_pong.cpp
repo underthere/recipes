@@ -4,7 +4,11 @@
 #include "async_simple/coro/Lazy.h"
 #include "async_simple/coro/SyncAwait.h"
 
+#include <async_simple/uthread/Async.h>
+
 #include "../coro_io/io_context_pool.hpp"
+
+using namespace async_simple;
 
 auto pong() -> async_simple::coro::Lazy<void>;
 auto pong() -> async_simple::coro::Lazy<void>;
@@ -22,6 +26,9 @@ auto pong() -> async_simple::coro::Lazy<void> {
 }
 
 int main() {
-    async_simple::coro::syncAwait(ping().via(coro_io::get_global_executor()));
+    auto ex = coro_io::get_global_executor();
+    uthread::async<uthread::Launch::Current>([](){
+        std::cout << "start" << std::endl;
+    }, ex);
     return 0;
 }

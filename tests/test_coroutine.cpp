@@ -49,28 +49,20 @@ struct ReturnObject {
 
 };
 
-auto make_number() -> ReturnObject<int> {
-    static int i {0};
-    co_return i++;
-}
 
 auto counter4() -> ReturnObject<int> {
-    for (int i = 0; i < 10; i++) {
-        co_yield i;
-    }
-    std::cout << "counter4: done\n";
+//    for (int i = 0; i < 10; i++) {
+//        co_yield i;
+//    }
     co_return 100;
 }
 
 
 int main() {
-    // std::coroutine_handle<ReturnObject3::promise_type> h = counter3();
     auto h = counter4().h_;
 
     while (!h.done()) {
-        std::cout << std::format("counter4: {}\n", h.promise().value_);
         h();
     }
-    std::cout << std::format("counter4 done with: {}\n", h.promise().value_);
     h.destroy();
 }
