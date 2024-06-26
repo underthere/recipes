@@ -2,122 +2,39 @@
 // Created on 2024/6/21.
 //
 
-#include <cassert>
-#include <cstdlib>
-#include <format>
-#include <functional>
 #include <iostream>
 
-typedef void* vthread_frame_t;
-typedef void* vthread_stack_pointer_t;
-struct vthread_transfer_t {
-    void* ctx;
-    void* data;
-};
+#include "vcontext.h"
 
-extern "C" {
-auto _vthread_make_context(vthread_frame_t sp, std::size_t size,
-                           void (*fn)(vthread_transfer_t))
-    -> vthread_stack_pointer_t;
 
-auto _vthread_jump(vthread_stack_pointer_t to, void* vp) -> vthread_transfer_t;
+
+
+auto ok() -> void {
+    for (int i = 0; i < 10; ++i) {
+        std::cout << "switch out" << std::endl;
+        auto vt = get_current();
+        vt->switch_out();
+    }
+    std::cout << "ok!" << std::endl;
 }
-
-class vthread;
-struct jump_buf_link;
-
-struct jump_buf_link {
-    vthread_frame_t fcontext{nullptr};
-    jump_buf_link* link = nullptr;
-    vthread* thread{nullptr};
-
-    auto switch_in() -> void;
-    auto switch_out() -> void;
-    auto final_switch_out() -> void;
-};
-
-class vthread {
-    struct stack_deleter {
-        auto operator()(char* ptr) const noexcept -> void { delete[] ptr; }
-    };
-    using vstack = std::unique_ptr<char[], stack_deleter>;
-    auto make_stack() -> vstack {
-        auto stack = vstack(new char[stack_size_]);
-        return stack;
-    }
-
-public:
-    explicit vthread(std::function<void()> func, size_t stack_size = 1024 * 512)
-        : func_(std::move(func)), stack_size_(stack_size) {
-        setup();
-    }
-
-    auto main() -> void {
-#if defined(__aarch64__)
-        asm(".cfi_undefined x30");
-#endif
-        func_();
-        done_ = true;
-        context_.final_switch_out();
-    }
-
-    static auto s_main(vthread_transfer_t t) -> void {
-        auto q = reinterpret_cast<vthread*>(t.data);
-        q->context_.link->fcontext = t.ctx;
-        q->main();
-    }
-
-    auto setup() -> void {
-        context_.fcontext = _vthread_make_context(stack_.get() + stack_size_,
-                                                  stack_size_, vthread::s_main);
-        context_.thread = this;
-        context_.switch_in();
-    }
-
-    auto switch_in() -> void { context_.switch_in(); }
-    auto switch_out() -> void { context_.switch_out(); }
-
-    std::size_t stack_size_{1024 * 512};
-    vstack stack_{make_stack()};
-    std::function<auto()->void> func_;
-    jump_buf_link context_;
-
-    bool joined_{false};
-    bool done_{false};
-};
-
-thread_local jump_buf_link g_unthreaded_context;
-thread_local jump_buf_link* g_current_context = nullptr;
-
-auto jump_buf_link::switch_in() -> void {
-    link = std::exchange(g_current_context, this);
-    if (!link) {
-        link = &g_unthreaded_context;
-    }
-    auto t = _vthread_jump(fcontext, thread);
-    fcontext = t.ctx;
-}
-
-auto jump_buf_link::switch_out() -> void {
-    g_current_context = link;
-    auto t = _vthread_jump(link->fcontext, thread);
-    fcontext = t.ctx;
-}
-
-auto jump_buf_link::final_switch_out() -> void {
-    g_current_context = link;
-    _vthread_jump(link->fcontext, thread);
-    assert(false);
-}
-
-auto ok() -> void { std::cout << "ok" << std::endl; }
 
 auto ping() -> void {
     std::cout << "ping" << std::endl;
     vthread vt(ok);
+    while (!vt.done_) {
+        std::cout << "switch in" << std::endl;
+        vt.switch_in();
+    }
+}
+
+auto make_coro(std::function<void()> f) -> void {
+    vthread vt(f);
+    while (!vt.done_) {
+        vt.switch_in();
+    }
 }
 
 int main() {
-    vthread vt(ping);
+    make_coro(ping);
     return 0;
 }

@@ -1,6 +1,6 @@
 .text
 .balign 16
-.global __vthread_jump
+.global __vthread_jump_context
 .global __vthread_make_context
 
  /*
@@ -73,7 +73,7 @@ x0: transfer_t
 
 */
 
-__vthread_jump:
+__vthread_jump_context:
     ; prepare stack for GP + FPU
     sub  sp, sp, #0xb0
 
