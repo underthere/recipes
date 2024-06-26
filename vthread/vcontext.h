@@ -56,6 +56,8 @@ public:
     auto main() -> void {
 #if defined(__aarch64__)
         asm(".cfi_undefined x30");
+#elif defined(__x86_64__)
+        asm(".cfi_undefined rip");
 #endif
         func_();
         done_ = true;
